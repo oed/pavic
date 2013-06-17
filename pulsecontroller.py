@@ -9,10 +9,23 @@ class PulseController:
         pass
 
 
-class PulseState:
-    pass
-
 import subprocess
+
+def run_pactl_command(args):
+    return subprocess.check_output(args.insert(0, "pactl"))
+
+class PulseState:
+    def __init__(self):
+        self._init_sinks()
+        self._init_sink_inputs()
+
+    def _init_sinks(self):
+        data = run_pactl_command(["list", "sinks"])
+        # TODO - create sinks from data
+
+    def _init_sink_inputs(self):
+        data = run_pactl_command(["list", "sink-inputs"])
+        # TODO - create sink-inputs from data
 
 class PulseSink:
     def __init__(self, index, name, description, muted, vol):
