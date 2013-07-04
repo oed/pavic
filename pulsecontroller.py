@@ -21,12 +21,12 @@ class PulseState:
         self._init_sinks()
         self._init_sink_inputs()
 
-    def _init_sinks(self):
+    def _get_sinks_data(self):
         data = run_pactl_command(["list", "sinks"])
         data = str(data)
         sinks_data = data.split("Sink #")[1:]
 
-        self.sinks = []
+        sinks = []
         for sink_data in sinks_data:
             
             mute = re.search('Mute: (.*?)\\\\', sink_data).group(1)
@@ -38,11 +38,21 @@ class PulseState:
             vols = re.search('Volume: 0: (.*?)% 1: (.*?)%', sink_data)
             vol = int((int(vols.group(2)) + int(vols.group(1)))/2)
 
-            sink = PulseSink(sink_data[0],
-                   re.search('Name: (.*?)\\\\', sink_data).group(1),
-                   re.search('Description: (.*?)\\\\', sink_data).group(1),
-                   muted,
-                   vol)
+            name = re.search('Name: (.*?)\\\\', sink_data).group(1),
+            description = re.search('Description: (.*?)\\\\', sink_data).group(1),
+            sinks.append([sink_data[0], name, description, muted, vol])
+
+        return sinks
+
+    def _init_sinks(self):
+        sinks_data = _get_sinks_data()
+
+        self.sinks = []
+        for sink_data in sinks_data:
+            sink = PulseSink(sink_data[0], sink_data[1],
+                                sink_data[2], sink_data[3],
+                                sink_data[4])
+
             self.sinks.append(sink)
                    
 
