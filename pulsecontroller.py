@@ -18,8 +18,11 @@ def run_pactl_command(args):
 
 class PulseState:
     def __init__(self):
-        self._init_sinks()
-        self._init_sink_inputs()
+
+        self.sinks = []
+        self.sink_inputs = []
+        self.update_sinks()
+        self.update_sink_inputs()
 
     def _get_sinks_data(self):
         data = run_pactl_command(["list", "sinks"])
@@ -44,11 +47,21 @@ class PulseState:
 
         return sinks
 
-    def _init_sinks(self):
+    def _get_sink_input_data(self):
+        data = run_patctl_command(["list", "sink-inputs"])
+        data = str(data)
+        inputs_data = data.split("Sink Input #")[1:]
+
+        inputs = []
+        # TODO - parse the data 
+
+        return inputs
+
+    def update_sinks(self):
         sinks_data = _get_sinks_data()
 
-        self.sinks = []
         for sink_data in sinks_data:
+            # TODO - only add sink if it's different from existing sinks
             sink = PulseSink(sink_data[0], sink_data[1],
                                 sink_data[2], sink_data[3],
                                 sink_data[4])
@@ -56,13 +69,9 @@ class PulseState:
             self.sinks.append(sink)
                    
 
-    def _init_sink_inputs(self):
+    def update_sink_inputs(self):
         data = run_pactl_command(["list", "sink-inputs"])
         # TODO - create sink-inputs from data
-
-    def get_data_points(data, main_point, data_points):
-        main_points = data.split(main_point)
-
 
 
 class PulseSink(object):
