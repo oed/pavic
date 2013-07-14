@@ -112,6 +112,10 @@ class PulseSink():
 
     def change_vol(self, percentage_point):
         self.vol += percentage_point
+        if self.vol < 0:
+            self.vol = 0
+        elif self.vol > 150:
+            self.vol = 150
         run_pactl_command(["set-sink-volume", self.index, self.vol+"%%"])
 
 class PulseSinkInput():
@@ -129,6 +133,10 @@ class PulseSinkInput():
 
     def change_vol(self, percentage_point):
         self.vol += percentage_point
+        if self.vol < 0:
+            self.vol = 0
+        elif self.vol > 150:
+            self.vol = 150
         run_pactl_command(["set-sink-input-volume", self.index, self.vol+"%%"])
 
     def change_sink(self, sink_index):
