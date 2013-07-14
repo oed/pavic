@@ -9,7 +9,6 @@ def run_pactl_command(args):
 
 class PulseController():
     def __init__(self):
-
         self.sinks = []
         self.sink_inputs = []
         self.update()
@@ -21,7 +20,6 @@ class PulseController():
 
         sinks = []
         for sink_data in sinks_data:
-            
             mute = re.search('Mute: (.*?)\\\\', sink_data).group(1)
             if mute == 'no':
                 muted = False
@@ -44,7 +42,6 @@ class PulseController():
 
         inputs = []
         for input_data in inputs_data:
-
             sink = re.search('Sink: (.*?)\\\\', input_data).group(1)
             mute = re.search('Mute: (.*?)\\\\', input_data).group(1)
             if mute == 'no':
@@ -62,7 +59,6 @@ class PulseController():
         return inputs
 
     def _update_unit(self, unit, data, modify, create):
-
         for d in data:
             for u in unit:
                 if u.index == d[0]:
@@ -111,12 +107,12 @@ class PulseSink():
         self.vol = vol
 
     def toggle_mute(self):
-        subprocess.Popen(["pactl set-sink-mute %s toggle" %self.index], stdout=subprocess.PIPE, shell=True)
+        run_pactl_command(["set-sink-mute", self.index, "toggle"])
         self.muted = not self.muted
 
     def change_vol(self, percentage_point):
         self.vol += percentage_point
-        subprocess.Popen(["pactl set-sink-volume %s %s%%" %(self.index, self.vol)], stdout=subprocess.PIPE, shell=True)
+        run_pactl_command(["set-sink-volume", self.index, self.vol+"%%"])
 
 class PulseSinkInput():
     def __init__(self, index, sink, muted, vol, app_name, icon_name):
@@ -128,12 +124,12 @@ class PulseSinkInput():
         self.icon_name = icon_name
 
     def toggle_mute(self):
-        subprocess.Popen(["pactl set-sink-input-mute %s toggle" %self.index], stdout=subprocess.PIPE, shell=True) 
+        run_pactl_command(["set-sink-input-mute", self.index, "toggle"])
         self.muted = not self.muted
 
     def change_vol(self, percentage_point):
         self.vol += percentage_point
-        subprocess.Popen(["pactl set-sink-input-volume %s %s%%" %(self.index, self.vol)], stdout=subprocess.PIPE, shell=True)
+        run_pactl_command(["set-sink-input-volume", self.index, self.vol+"%%"])
 
     def change_sink(self, sink_index):
-        subprocess.Popen(["pactl move-sink-input %s %s" %(self.index, sink_index)], stdout=subprocess.PIPE, shell=True)
+        run_pactl_command(["move-sink-input", self.index, sink_index])
