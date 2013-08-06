@@ -1,4 +1,4 @@
-#!/usr/bin
+#!/usr/bin/python
 
 import subprocess
 import re
