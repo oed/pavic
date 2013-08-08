@@ -9,7 +9,7 @@ def main():
     parser.add_argument('-v', '--version', action='version', version='%(prog)s 0.1' )
     parser.add_argument('action', 
             choices=['vol_up', 'vol_down', 'toggle_mute', 'sink_next', 'sink_prev'])
-    parser.add_argument('-s', '--step', type=int, 
+    parser.add_argument('-s', '--step', type=int, default=10,
             help="step in which volume is changed")
     
     group = parser.add_mutually_exclusive_group()
