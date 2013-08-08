@@ -24,5 +24,16 @@ def main():
     print(args.sink)
     print(args.step)
 
+    
+def changeSink(client, direction):
+    if direction == 'sink_next':
+        pass
+   # TODO fix exception. 
+    
+def changeVolume(client, step, direction):
+    if direction == 'vol_down':
+        step = -1*step
+    client.change_vol(step)
+    
 if __name__ == '__main__':
     main()
