@@ -22,10 +22,10 @@ class pavic():
                 if int(s.index) == self.sink:
                     client_list.append(s)
         if self.program == 'CURRENT':
-            name = self._get_current_program()
-            for s in self.pc.sink_inputs:
-                if name in s.app_name:
-                    client_list.append(s)
+            self.program = self._get_current_program()
+        for s in self.pc.sink_inputs:
+            if self.program in s.app_name:
+                client_list.append(s)
 
         return client_list 
 
@@ -63,10 +63,6 @@ def main():
             help="which sink(s) to change volume on")
     
     args = parser.parse_args()
-
-    print(args.program)
-    print(args.sink)
-    print(args.step)
 
     p = pavic(args.program, args.sink, args.step)
     p.do_action(args.action)
