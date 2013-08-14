@@ -16,28 +16,35 @@ class pavic():
         self.clients = self.get_clients()
 
     def get_clients(self):
+        client_list = []
         if not self.sink == None:
             for s in self.pc.sinks:
                 if int(s.index) == self.sink:
-                    return [s]
+                    client_list.append(s)
         if self.program == 'CURRENT':
             name = self._get_current_program()
-            print (name)
             for s in self.pc.sink_inputs:
-                if s.name == self.app_name:
-                    return [s]
+                if name in s.app_name:
+                    client_list.append(s)
 
-        return []
+        return client_list 
 
     def _get_current_program(self):
-        text = subprocess.check_output("xprop -id $(xprop -root 32x '\t$0' _NET_ACTIVE_WINDOW | cut -f 2) WM_CLASS")
-        
-        return text[text.find('"'):text.find('",')]
+        active = subprocess.check_output("xprop -root _NET_ACTIVE_WINDOW".split()).decode("utf-8")
+        active = active[active.find('0'):-1]
+        text = subprocess.check_output(["xprop", "-id", active, "WM_CLASS"]).decode("utf-8")
+        return text[text.find('"')+1:text.find('",')]
 
     def do_action(self, action):
         if action == 'toggle_mute':
             for client in self.clients:
                 client.toggle_mute()
+        elif action == 'vol_up':
+            for client in self.clients:
+                client.change_vol(self.step)
+        elif action == 'vol_down':
+            for client in self.clients:
+                client.change_vol(self.step*-1)
 
 
 

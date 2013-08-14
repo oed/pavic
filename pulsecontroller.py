@@ -116,7 +116,7 @@ class PulseSink():
             self.vol = 0
         elif self.vol > 150:
             self.vol = 150
-        run_pactl_command(["set-sink-volume", self.index, self.vol+"%%"])
+        run_pactl_command(["set-sink-volume", self.index, "%s%%" %self.vol])
 
 class PulseSinkInput():
     def __init__(self, index, sink, muted, vol, app_name, icon_name):
@@ -137,7 +137,7 @@ class PulseSinkInput():
             self.vol = 0
         elif self.vol > 150:
             self.vol = 150
-        run_pactl_command(["set-sink-input-volume", self.index, self.vol+"%%"])
+        run_pactl_command(["set-sink-input-volume", self.index, "%s%%" %self.vol])
 
     def change_sink(self, sink_index):
         run_pactl_command(["move-sink-input", self.index, sink_index])
