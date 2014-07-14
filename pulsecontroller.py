@@ -3,11 +3,14 @@
 import subprocess
 import re
 
+
 def run_pactl_command(args):
     args.insert(0, "pactl")
     return subprocess.check_output(args)
 
+
 class PulseController():
+
     def __init__(self):
         self.sinks = []
         self.sink_inputs = []
@@ -20,18 +23,19 @@ class PulseController():
 
         sinks = []
         for sink_data in sinks_data:
+            index = sink_data.split("\\n")[0]
             mute = re.search('Mute: (.*?)\\\\', sink_data).group(1)
             if mute == 'no':
                 muted = False
             else:
                 muted = True
 
-            vols = re.search('Volume: .*\/ (.*?)% \/.*\/ (.*?)%', sink_data)
-            vol = int((int(vols.group(2)) + int(vols.group(1)))/2)
+            vols = re.search('Volume: .*\/ (.*?)% \/.*\/ (.*?)% .*Base', sink_data)
+            vol = int((int(vols.group(2)) + int(vols.group(1))) / 2)
 
             name = re.search('Name: (.*?)\\\\', sink_data).group(1),
             description = re.search('Description: (.*?)\\\\', sink_data).group(1)
-            sinks.append([sink_data[0], name, description, muted, vol])
+            sinks.append([index, name, description, muted, vol])
 
         return sinks
 
@@ -42,6 +46,7 @@ class PulseController():
 
         inputs = []
         for input_data in inputs_data:
+            index = input_data.split("\\n")[0]
             sink = re.search('Sink: (.*?)\\\\', input_data).group(1)
             mute = re.search('Mute: (.*?)\\\\', input_data).group(1)
             if mute == 'no':
@@ -49,12 +54,12 @@ class PulseController():
             else:
                 muted = True
 
-            vols = re.search('Volume: 0: (.*?)% 1: (.*?)%', input_data)
-            vol = int((int(vols.group(2)) + int(vols.group(1)))/2)
+            vols = re.search('Volume: .*\/ (.*?)% \/.*\/ (.*?)%', input_data)
+            vol = int((int(vols.group(2)) + int(vols.group(1))) / 2)
 
             name = re.search('application.name = "(.*?)"\\\\', input_data).group(1)
             icon = re.search('application.icon_name = "(.*?)"\\\\', input_data).group(1)
-            inputs.append([input_data[0], sink, muted, vol, name, icon])
+            inputs.append([index, sink, muted, vol, name, icon])
 
         return inputs
 
@@ -98,6 +103,7 @@ class PulseController():
         self._update_unit(self.sink_inputs, self._get_sink_input_data(),
                 self._modify_sink_input, self._create_sink_input)
 
+
 class PulseSink():
     def __init__(self, index, name, description, muted, vol):
         self.index = index
@@ -111,12 +117,16 @@ class PulseSink():
         self.muted = not self.muted
 
     def change_vol(self, percentage_point):
+        print(self.vol)
+        print(percentage_point)
         self.vol += percentage_point
         if self.vol < 0:
             self.vol = 0
         elif self.vol > 150:
             self.vol = 150
         run_pactl_command(["set-sink-volume", self.index, "%s%%" %self.vol])
+        print(self.vol)
+
 
 class PulseSinkInput():
     def __init__(self, index, sink, muted, vol, app_name, icon_name):
