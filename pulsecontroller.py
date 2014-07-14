@@ -26,7 +26,7 @@ class PulseController():
             else:
                 muted = True
 
-            vols = re.search('Volume: 0: (.*?)% 1: (.*?)%', sink_data)
+            vols = re.search('Volume: .*\/ (.*?)% \/.*\/ (.*?)%', sink_data)
             vol = int((int(vols.group(2)) + int(vols.group(1)))/2)
 
             name = re.search('Name: (.*?)\\\\', sink_data).group(1),
@@ -54,7 +54,7 @@ class PulseController():
 
             name = re.search('application.name = "(.*?)"\\\\', input_data).group(1)
             icon = re.search('application.icon_name = "(.*?)"\\\\', input_data).group(1)
-            inputs.append([input_data[0], sink, muted, vol, name, icon]) 
+            inputs.append([input_data[0], sink, muted, vol, name, icon])
 
         return inputs
 
@@ -62,11 +62,11 @@ class PulseController():
         for d in data:
             for u in unit:
                 if u.index == d[0]:
-                    modify(u, d) 
+                    modify(u, d)
                     break
-            else:       
+            else:
                 unit.append(create(d))
-                   
+
     def _modify_sink(self, sink, data):
         sink.name = data[1]
         sink.description = data[2]
